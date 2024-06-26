@@ -2,13 +2,21 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
-
-let package = Package(
-    name: "street-illuminator",
-    targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .executableTarget(
-            name: "street-illuminator"),
-    ]
-)
+    
+ let package = Package(
+   name: "StreetIlluminator",
+   products: [
+     .executable(name: "StreetIlluminator", targets: ["StreetIlluminator"]),
+   ],
+   dependencies: [
+     .package(url: "https://github.com/swift-server/swift-aws-lambda-runtime.git", .upToNextMajor(from:"0.3.0")),
+   ],
+   targets: [
+     .target(
+       name: "StreetIlluminator",
+       dependencies: [
+         .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime"),
+       ]
+     ),
+   ]
+ )
