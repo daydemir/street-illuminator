@@ -10,12 +10,14 @@ import PackageDescription
    ],
    dependencies: [
      .package(url: "https://github.com/swift-server/swift-aws-lambda-runtime.git", .upToNextMajor(from:"0.3.0")),
+     .package(url: "https://github.com/swift-server/async-http-client/", .upToNextMajor(from: "1.21.2")),
    ],
    targets: [
      .target(
        name: "StreetIlluminator",
        dependencies: [
          .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime"),
+         .product(name: "AsyncHTTPClient", package: "async-http-client"),
        ]
      ),
    ]
