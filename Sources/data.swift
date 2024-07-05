@@ -27,13 +27,12 @@ protocol MultiImageRequest {
 enum Provider {
     case mapillary(box: BoundingBox, limit: Int)
 //    case googleStreetView(box: BoundingBox)
-    case amsterdamPanos(box: BoundingBox, limit: Int)
+    case amsterdamPanos(box: BoundingBox, after: Date, limit: Int)
     
     func fetchImages(completion: @escaping (_ result: Result<[ImageData], Error>) -> Void) throws {
         switch self {
-        case .amsterdamPanos(let box, let limit):
-            try AmsterdamPanoramas.Request(box: box, after: Date("1/1/2019, 12:00 PM", strategy: .dateTime), limit: limit).images(completion: completion)
-            
+        case .amsterdamPanos(let box, let after, let limit):
+            try AmsterdamPanoramas.Request(box: box, after: after, limit: limit).images(completion: completion)
             
 //        case .googleStreetView(let box):
             
