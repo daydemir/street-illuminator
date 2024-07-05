@@ -37,14 +37,14 @@ enum Provider {
             return try await Mapillary.Request(box: box, limit: limit).images()
         }
         
-        //        case .googleStreetView(let box):
-        
-        //            let request = try HTTPClient.Request(url: "https://maps.googleapis.com/maps/api/streetview?\(parameters.queryParams())", method: .GET)
-        //            Network.run(request: request) { result in
-        //                switch result {
-        //                case .success(let response):
-        //                }
-        //            }
+//        case .googleStreetView(let box):
+//
+//            let request = try HTTPClient.Request(url: "https://maps.googleapis.com/maps/api/streetview?\(parameters.queryParams())", method: .GET)
+//            Network.run(request: request) { result in
+//                switch result {
+//                case .success(let response):
+//                }
+//            }
     }
 }
 

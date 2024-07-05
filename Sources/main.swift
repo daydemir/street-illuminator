@@ -18,11 +18,6 @@ struct Output: Codable {
     let result: String
 }
 
-enum SIError: Swift.Error {
-    case requestError(_: String)
-    case unknown
-}
-
 Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Error>) -> Void) in
     
     Task {
