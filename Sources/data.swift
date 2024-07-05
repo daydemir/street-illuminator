@@ -20,32 +20,31 @@ protocol MultiImageRequest {
     var box: BoundingBox { get }
     var limit: Int { get }
     
-    func images(completion: @escaping (_ result: Result<[ImageData], Error>) -> Void) throws
+    func images() async throws -> [ImageData]
 }
 
-@available(macOS 12.0, *)
 enum Provider {
     case mapillary(box: BoundingBox, limit: Int)
-//    case googleStreetView(box: BoundingBox)
+    //    case googleStreetView(box: BoundingBox)
     case amsterdamPanos(box: BoundingBox, after: Date, limit: Int)
     
-    func fetchImages(completion: @escaping (_ result: Result<[ImageData], Error>) -> Void) throws {
+    func fetchImages() async throws -> [ImageData] {
         switch self {
         case .amsterdamPanos(let box, let after, let limit):
-            try AmsterdamPanoramas.Request(box: box, after: after, limit: limit).images(completion: completion)
-            
-//        case .googleStreetView(let box):
-            
-//            let request = try HTTPClient.Request(url: "https://maps.googleapis.com/maps/api/streetview?\(parameters.queryParams())", method: .GET)
-//            Network.run(request: request) { result in
-//                switch result {
-//                case .success(let response):
-//                }
-//            }
+            return try await AmsterdamPanoramas.Request(box: box, after: after, limit: limit).images()
             
         case .mapillary(let box, let limit):
-            try Mapillary.Request(box: box, limit: limit).images(completion: completion)
+            return try await Mapillary.Request(box: box, limit: limit).images()
         }
+        
+        //        case .googleStreetView(let box):
+        
+        //            let request = try HTTPClient.Request(url: "https://maps.googleapis.com/maps/api/streetview?\(parameters.queryParams())", method: .GET)
+        //            Network.run(request: request) { result in
+        //                switch result {
+        //                case .success(let response):
+        //                }
+        //            }
     }
 }
 
@@ -120,12 +119,5 @@ struct Geometry: Codable {
         }
         
         return Coordinates(latitude: lat, longitude: long, altitude: coordinates[safe: 2])
-    }
-}
-
-extension Collection {
-    /// Returns the element at the specified index if it is within bounds, otherwise nil.
-    subscript (safe index: Index) -> Element? {
-        return indices.contains(index) ? self[index] : nil
     }
 }

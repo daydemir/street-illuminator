@@ -1,6 +1,7 @@
 import AWSLambdaRuntime
 import CoreLocation
 import AsyncHTTPClient
+import SwiftyJSON
 
 struct Coordinates: Codable {
     let latitude: Double
@@ -22,50 +23,24 @@ enum SIError: Swift.Error {
     case unknown
 }
 
-if #available(macOS 12.0, *) {
-    Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Error>) -> Void) in
-        
+Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Error>) -> Void) in
+    
+    Task {
         let box = BoundingBox(coordinate1: input.coordinate1, coordinate2: input.coordinate2)
         do {
-            try Provider.amsterdamPanos(box: box, after: Date("1/1/2017, 12:00 PM", strategy: .dateTime), limit: 27).fetchImages { result in
-//            try Provider.googleStreetView(box: box).fetchImages { result in
-//            try Provider.mapillary(box: box, limit: 5).fetchImages { result in
-                
-                switch result {
-                case .success(let data):
-                    print(data.count)
-                    print(data.map { $0.date() })
-                    print(data)
-//                    for datum in data {
-//                        do {
-//                            var results: [String] = []
-//                            try Model.hiveAesthetics.run(withData: datum) { result in
-//    
-//                                print("hive result")
-//                                print(result)
-//                                switch result {
-//                                case .success(let success):
-//                                    let resultString = String(data: success, encoding: .utf8)!
-//                                    print(resultString)
-//                                    results.append(resultString)
-//                                case .failure(let failure):
-//                                    results.append(failure.localizedDescription)
-//                                }
-//                            }
-//    
-//                            let fullMessage = results.joined(separator: "\n\n")
-//                            callback(.success(Output(result: fullMessage)))
-//                        } catch {
-//                            callback(.failure(error))
-//                        }
-//                    }
-                    
-                case .failure(let error):
-                    callback(.failure(error))
-                }
-            }
+            let data = try await Provider.amsterdamPanos(box: box, after: Date("1/1/2017, 12:00 PM", strategy: .dateTime), limit: 2).fetchImages()
+            //            try Provider.googleStreetView(box: box).fetchImages { result in
+            //            try Provider.mapillary(box: box, limit: 5).fetchImages { result in
+            print(data.count)
+            print(data.map { $0.date() })
+            print(data)
+            
+            let results = try await data.asyncMap { try await Model.hiveAesthetics.run(with: $0) }
+            callback(.success(Output(result: results.joined(separator: "\n\n"))))
         } catch {
             callback(.failure(error))
         }
     }
 }
+
+

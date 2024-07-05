@@ -12,6 +12,7 @@ struct Mapillary {
     
     struct Request: MultiImageRequest {
         
+        
         let box: BoundingBox
         let limit: Int
         
@@ -24,22 +25,10 @@ struct Mapillary {
             return "access_token=\(Keys().mapillaryAPIKey)&bbox=\(box.cornersQuery())&limit=\(limit)&fields=id,thumb_2048_url,geometry,captured_at,detections"
         }
         
-        func images(completion: @escaping (Result<[ImageData], any Error>) -> Void) throws {
-            let request = try HTTPClient.Request(url: "https://graph.mapillary.com/images?\(queryParams())", method: .GET)
-            
-            Network.run(request: request) { result in
-                switch result {
-                case .success(let success):
-                    do {
-                        let imageGroup = try JSONDecoder().decode(ImageGroup.self, from: success)
-                        completion(.success(imageGroup.data))
-                    } catch {
-                        completion(.failure(error))
-                    }
-                case .failure(let error):
-                    completion(.failure(error))
-                }
-            }
+        
+        func images() async throws -> [any ImageData] {
+            let request = HTTPClientRequest(url: "https://graph.mapillary.com/images?\(queryParams())")
+            return try await JSONDecoder().decode(ImageGroup.self, from: Network.run(request: request)).data
         }
     }
 

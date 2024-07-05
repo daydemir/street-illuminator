@@ -5,6 +5,9 @@ import PackageDescription
     
  let package = Package(
    name: "StreetIlluminator",
+   platforms: [
+           .macOS(.v13)
+    ],
    products: [
      .executable(name: "StreetIlluminator", targets: ["StreetIlluminator"]),
    ],

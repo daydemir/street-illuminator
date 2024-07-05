@@ -89,33 +89,24 @@ struct AmsterdamPanoramas {
             }
         }
         
-        func images(completion: @escaping (Result<[ImageData], any Error>) -> Void) throws {
-            let url = URL(string: base + "?bbox=\(box.cornersQuery())&limit_results=\(limit)\(dateQuery())")!
-            try makeRequest(url: url, currentImages: [], completion: completion)
+        func images() async throws -> [ImageData] {
+            let url = base + "?bbox=\(box.cornersQuery())&limit_results=\(limit)\(dateQuery())"
+            return try await collectImages(url: url, currentImages: [])
         }
         
-        private func makeRequest(url: URL, currentImages: [ImageData], completion: @escaping (Result<[ImageData], any Error>) -> Void) throws {
-            let request = try HTTPClient.Request(url: url, method: .GET)
-            Network.run(request: request) { result in
-                switch result {
-                case .success(let success):
-                    do {
-                        let imageGroup = try JSONDecoder().decode(MultiImage.self, from: success)
-                        let updatedImages = currentImages + imageGroup._embedded.panoramas
-                        print("image count: \(imageGroup.count)")
-                        print("image actual count: \(imageGroup._embedded.panoramas.count)")
-                        print("next: \(imageGroup._links.next.href)")
-                        if let next = imageGroup._links.next.href, let nextURL = URL(string: next) {
-                            try makeRequest(url: nextURL, currentImages: updatedImages, completion: completion)
-                        } else {
-                            completion(.success(updatedImages))
-                        }
-                    } catch {
-                        completion(.failure(error))
-                    }
-                case .failure(let failure):
-                    completion(.failure(failure))
-                }
+        private func collectImages(url: String, currentImages: [ImageData]) async throws -> [ImageData] {
+            let data = try await Network.run(request: HTTPClientRequest(url: url))
+            let imageGroup = try JSONDecoder().decode(MultiImage.self, from: data)
+            let updatedImages = currentImages + imageGroup._embedded.panoramas
+            print("image count: \(imageGroup.count)")
+            print("image actual count: \(imageGroup._embedded.panoramas.count)")
+            print("next: \(imageGroup._links.next.href)")
+            
+            if let next = imageGroup._links.next.href {
+                try await Task.sleep(for: .seconds(1)) //delay to avoid over hitting the API
+                return try await collectImages(url: next, currentImages: updatedImages)
+            } else {
+                return updatedImages
             }
         }
     }

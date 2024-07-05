@@ -8,25 +8,13 @@
 import Foundation
 import AsyncHTTPClient
 import NIOFoundationCompat
+import NIOCore
 
 struct Network {
-    static func run(request: HTTPClient.Request, completion: @escaping (_ result: Result<Foundation.Data, Swift.Error>) -> Void) {
-        print(request.url)
-        HTTPClient.shared.execute(request: request).whenComplete { result in
-            switch result {
-            case .failure(let error):
-                completion(.failure(error))
-            case .success(let response):
-                if let body = response.body {
-                    completion(.success(Foundation.Data(buffer: body)))
-                } else {
-                    completion(.failure(Error.unknown))
-                }
-            }
-        }
-    }
     
-    enum Error: Swift.Error {
-        case unknown
+    static func run(request: HTTPClientRequest) async throws -> Data {
+        print("request url: \(request.url)")
+        let response = try await HTTPClient.shared.execute(request, timeout: .seconds(30))
+        return Data(buffer: try await response.body.collect(upTo: 1024*1024*10)) //10mb
     }
 }
