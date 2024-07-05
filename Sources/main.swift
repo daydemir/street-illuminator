@@ -11,8 +11,9 @@ struct Coordinates: Codable {
 }
 
 struct Input: Codable {
-    let coordinate1: Coordinates
-    let coordinate2: Coordinates
+    let test: String
+//    let coordinate1: Coordinates
+//    let coordinate2: Coordinates
 }
 
 struct Output: Codable {
@@ -21,7 +22,7 @@ struct Output: Codable {
 
 Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Error>) -> Void) in
     
-    callback(.success(Output(result: "hello world")))
+    callback(.success(Output(result: "hello: \(input.test)")))
 //    Task {
 //        let box = BoundingBox(coordinate1: input.coordinate1, coordinate2: input.coordinate2)
 //        do {
