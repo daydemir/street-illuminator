@@ -7,11 +7,11 @@ https://fabianfett.dev/getting-started-with-swift-aws-lambda-runtime
 First...
 ```
 docker run \                   
-    --rm \
-    --volume "$(pwd)/:/src" \
-    --workdir "/src/" \
-    swift:5.10.1-amazonlinux2 \
-    swift build --product StreetIlluminator -c release -Xswiftc -static-stdlib
+--rm \
+--volume "$(pwd)/:/src" \
+--workdir "/src/" \
+swift:5.10.1-amazonlinux2 \
+swift build --product StreetIlluminator -c release -Xswiftc -static-stdlib \
 ```
 then...
 ```
