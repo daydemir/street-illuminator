@@ -24,16 +24,26 @@ protocol MultiImageRequest {
 }
 
 enum Provider {
-    case mapillary(box: BoundingBox, limit: Int)
+    case mapillary
     //    case googleStreetView(box: BoundingBox)
-    case amsterdamPanos(box: BoundingBox, after: Date?, limit: Int)
+    case amsterdamPanos
     
-    func fetchImages() async throws -> [ImageData] {
+    
+    func loadImages(startPage: Int?, limit: Int?) async throws {
         switch self {
-        case .amsterdamPanos(let box, let after, let limit):
-            return try await AmsterdamPanoramas.Request(box: box, after: after, limit: limit).images()
+        case .amsterdamPanos:
+            return try await AmsterdamPanoramas.AllRequest(startPage: startPage, limit: limit, selfPaginate: false).images()
+        case .mapillary:
+            throw Error.unsupported
+        }
+    }
+    
+    func fetchImages(box: BoundingBox, after: Date?, limit: Int) async throws -> [ImageData] {
+        switch self {
+        case .amsterdamPanos:
+            return try await AmsterdamPanoramas.BoxRequest(box: box, after: after, limit: limit).images()
             
-        case .mapillary(let box, let limit):
+        case .mapillary:
             return try await Mapillary.Request(box: box, limit: limit).images()
         }
         
@@ -45,6 +55,10 @@ enum Provider {
 //                case .success(let response):
 //                }
 //            }
+    }
+    
+    enum Error: Swift.Error {
+        case unsupported
     }
 }
 
