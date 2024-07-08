@@ -1,8 +1,7 @@
+import Foundation
 import AWSLambdaRuntime
 import SmithyIdentity
-import CoreLocation
 import AsyncHTTPClient
-import SwiftyJSON
 
 struct Coordinates: Codable {
     let latitude: Double
@@ -11,9 +10,8 @@ struct Coordinates: Codable {
 }
 
 struct Input: Codable {
-    let test: String
-//    let coordinate1: Coordinates
-//    let coordinate2: Coordinates
+    let coordinate1: Coordinates
+    let coordinate2: Coordinates
 }
 
 struct Output: Codable {
@@ -21,24 +19,22 @@ struct Output: Codable {
 }
 
 Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Error>) -> Void) in
-    
-    callback(.success(Output(result: "hello: \(input.test)")))
-//    Task {
-//        let box = BoundingBox(coordinate1: input.coordinate1, coordinate2: input.coordinate2)
-//        do {
-//            let data = try await Provider.amsterdamPanos(box: box, after: Date("1/1/2017, 12:00 PM", strategy: .dateTime), limit: 2).fetchImages()
-//            //            try Provider.googleStreetView(box: box).fetchImages { result in
-//            //            try Provider.mapillary(box: box, limit: 5).fetchImages { result in
-////            print(data.count)
-////            print(data.map { $0.date() })
-////            print(data)
-////            
-////            let results = try await data.asyncMap { try await Model.hiveAesthetics.run(with: $0) }
-////            callback(.success(Output(result: results.joined(separator: "\n\n"))))
+    Task {
+        let box = BoundingBox(coordinate1: input.coordinate1, coordinate2: input.coordinate2)
+        do {
+            let data = try await Provider.amsterdamPanos(box: box, after: Date("1/1/2017, 12:00 PM", strategy: .dateTime), limit: 2).fetchImages()
+            //            try Provider.googleStreetView(box: box).fetchImages { result in
+            //            try Provider.mapillary(box: box, limit: 5).fetchImages { result in
+//            print(data.count)
+//            print(data.map { $0.date() })
+//            print(data)
 //            
-//            callback(.success(Output(result: data.description)))
-//        } catch {
-//            callback(.failure(error))
-//        }
-//    }
+//            let results = try await data.asyncMap { try await Model.hiveAesthetics.run(with: $0) }
+//            callback(.success(Output(result: results.joined(separator: "\n\n"))))
+            
+            callback(.success(Output(result: data.description)))
+        } catch {
+            callback(.failure(error))
+        }
+    }
 }

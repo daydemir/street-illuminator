@@ -1,7 +1,26 @@
 # Street Illuminator
 
+## Instructions
 https://fabianfett.dev/getting-started-with-swift-aws-lambda-runtime
 
+## Command to get zip for AWS Lambda
+First...
+```
+docker run \                   
+    --rm \
+    --volume "$(pwd)/:/src" \
+    --workdir "/src/" \
+    swift:5.10.1-amazonlinux2 \
+    swift build --product StreetIlluminator -c release -Xswiftc -static-stdlib
+```
+then...
+```
+scripts/package.sh StreetIlluminator
+```
+
+
+
+## Test CURL to localhost
 ```
 curl --header "Content-Type: application/json" \
   --request POST \
