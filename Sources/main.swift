@@ -10,7 +10,7 @@ struct Coordinates: Codable {
 }
 
 struct Input: Codable {
-    let body: [String: Int]
+    let body: Data
 //    let coordinate1: Coordinates
 //    let coordinate2: Coordinates
 }
@@ -23,7 +23,8 @@ Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Swift.E
     Task {
 //        let box = BoundingBox(coordinate1: input.coordinate1, coordinate2: input.coordinate2)
         
-        guard let startPage = input.body["start_page"] else {
+        let body: [String: Int] = try JSONDecoder().decode([String: Int].self, from: input.body)
+        guard let startPage = body["start_page"] else {
             callback(.failure(Error.noStartPage))
             return
         }
