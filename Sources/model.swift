@@ -7,7 +7,7 @@
 
 import Foundation
 import AsyncHTTPClient
-import SwiftyJSON
+//import SwiftyJSON
 
 
 enum Model {
