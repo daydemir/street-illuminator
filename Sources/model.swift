@@ -8,6 +8,9 @@
 import Foundation
 import AsyncHTTPClient
 //import SwiftyJSON
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 
 enum Model {
@@ -22,9 +25,23 @@ enum Model {
             let body = "url=\(try data.imageURL().absoluteString)"
             request.httpBody = body.data(using: .utf8)
             
-            let (data, _) = try await URLSession.shared.data(for: request)
-            let string = String(data: data, encoding: .utf8)!
-            return string
+            //using this until we upgrade to Swift 6, where FoundationNetworking (used on Linux not macOS) should have the async/await functions available
+            return try await withCheckedThrowingContinuation { continuation in
+                URLSession.shared.dataTask(with: request) { data, response, error in
+                    if let data {
+                        let string = String(data: data, encoding: .utf8)!
+                        continuation.resume(returning: string)
+                    } else if let error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume(throwing: Error.unknown)
+                    }
+                }
+            }
         }
+    }
+    
+    enum Error: String, Swift.Error {
+        case unknown
     }
 }

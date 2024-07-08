@@ -26,7 +26,7 @@ protocol MultiImageRequest {
 enum Provider {
     case mapillary(box: BoundingBox, limit: Int)
     //    case googleStreetView(box: BoundingBox)
-    case amsterdamPanos(box: BoundingBox, after: Date, limit: Int)
+    case amsterdamPanos(box: BoundingBox, after: Date?, limit: Int)
     
     func fetchImages() async throws -> [ImageData] {
         switch self {
@@ -112,7 +112,6 @@ struct Geometry: Codable {
     let coordinates: [Double]
     
     func getCoordinates() -> Coordinates? {
-        var coordinates = coordinates
         guard let long = coordinates[safe: 0],
               let lat = coordinates[safe: 1] else {
             return nil

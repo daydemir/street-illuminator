@@ -22,7 +22,7 @@ Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Error>)
     Task {
         let box = BoundingBox(coordinate1: input.coordinate1, coordinate2: input.coordinate2)
         do {
-            let data = try await Provider.amsterdamPanos(box: box, after: Date("1/1/2017, 12:00 PM", strategy: .dateTime), limit: 2).fetchImages()
+            let data = try await Provider.amsterdamPanos(box: box, after: nil, limit: 2).fetchImages()
             //            try Provider.googleStreetView(box: box).fetchImages { result in
             //            try Provider.mapillary(box: box, limit: 5).fetchImages { result in
 //            print(data.count)

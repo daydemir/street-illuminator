@@ -100,7 +100,7 @@ struct AmsterdamPanoramas {
             let updatedImages = currentImages + imageGroup._embedded.panoramas
             print("image count: \(imageGroup.count)")
             print("image actual count: \(imageGroup._embedded.panoramas.count)")
-            print("next: \(imageGroup._links.next.href)")
+            print("next: \(imageGroup._links.next.href ?? "none")")
             
             if let next = imageGroup._links.next.href {
                 try await Task.sleep(for: .seconds(1)) //delay to avoid over hitting the API
