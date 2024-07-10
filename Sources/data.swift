@@ -29,10 +29,19 @@ enum Provider {
     case amsterdamPanos
     
     
+    func loadImages(box: BoundingBox, startPage: Int?, limit: Int?) async throws {
+        switch self {
+        case .amsterdamPanos:
+            try await AmsterdamPanoramas.BoxRequest.init(box: box, after: nil, limit: limit ?? Int.max, page: startPage, selfPaginate: false).saveImages()
+        case .mapillary:
+            throw Error.unsupported
+        }
+    }
+    
     func loadImages(startPage: Int?, limit: Int?) async throws {
         switch self {
         case .amsterdamPanos:
-            return try await AmsterdamPanoramas.AllRequest(startPage: startPage, limit: limit, selfPaginate: false).images()
+            return try await AmsterdamPanoramas.AllRequest(startPage: startPage, limit: limit, selfPaginate: false).saveImages()
         case .mapillary:
             throw Error.unsupported
         }
@@ -41,7 +50,7 @@ enum Provider {
     func fetchImages(box: BoundingBox, after: Date?, limit: Int) async throws -> [ImageData] {
         switch self {
         case .amsterdamPanos:
-            return try await AmsterdamPanoramas.BoxRequest(box: box, after: after, limit: limit).images()
+            return try await AmsterdamPanoramas.BoxRequest(box: box, after: after, limit: limit, page: nil, selfPaginate: true).images()
             
         case .mapillary:
             return try await Mapillary.Request(box: box, limit: limit).images()

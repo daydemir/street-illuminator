@@ -118,18 +118,20 @@ struct AmsterdamPanoramas {
             }
         }
         
-        func images() async throws {
+        func saveImages() async throws {
             let url = AmsterdamPanoramas.base + "?\(startPageQuery())&\(limitQuery())"
             try await collectImagesAndWriteDB(url: url, selfPaginate: selfPaginate)
         }
         
     }
     
-    struct BoxRequest: MultiImageRequest {
+    struct BoxRequest: MultiImageRequest, Codable {
         
         let box: BoundingBox
         let after: Date?
         let limit: Int
+        let page: Int?
+        let selfPaginate: Bool
         
         
         private func dateQuery() -> String {
@@ -143,9 +145,24 @@ struct AmsterdamPanoramas {
             }
         }
         
+        func saveImages() async throws {
+            try await collectImagesAndWriteDB(url: url, selfPaginate: selfPaginate)
+        }
+        
         func images() async throws -> [ImageData] {
-            let url = AmsterdamPanoramas.base + "?bbox=\(box.cornersQuery())&limit_results=\(limit)\(dateQuery())"
             return try await collectImages(url: url, currentImages: [])
+        }
+        
+        private func startPageQuery() -> String {
+            if let page {
+                return "&page=\(page)"
+            } else {
+                return ""
+            }
+        }
+        
+        var url: String {
+            return AmsterdamPanoramas.base + "?bbox=\(box.cornersQuery())&limit_results=\(limit)\(dateQuery())\(startPageQuery())"
         }
     }
     

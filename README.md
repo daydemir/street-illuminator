@@ -27,3 +27,10 @@ curl --header "Content-Type: application/json" \
   --data '{"coordinate1": {"longitude": 4.910801, "latitude": 52.373718331214945}, "coordinate2": {"longitude": 4.917425, "latitude": 52.375034}}' \
   http://127.0.0.1:7000/invoke
 ```
+
+```
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"body": "{\"box\": {\"coordinate1\": {\"longitude\": 4.664532, \"latitude\": 52.747660},\"coordinate2\": {\"longitude\": 5.164188, \"latitude\": 51.991564}},\"selfPaginate\": false,\"page\":2,\"limit\":10000000}"}' \
+  http://127.0.0.1:7000/invoke
+  ```
