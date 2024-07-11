@@ -6,12 +6,12 @@ https://fabianfett.dev/getting-started-with-swift-aws-lambda-runtime
 ## Command to get zip for AWS Lambda
 First...
 ```
-docker run \                   
---rm \
---volume "$(pwd)/:/src" \
---workdir "/src/" \
-swift:5.10.1-amazonlinux2 \
-swift build --product StreetIlluminator -c release -Xswiftc -static-stdlib \
+docker run \                                    
+    --rm \        
+    --volume "$(pwd)/:/src" \  
+    --workdir "/src/" \                                                      
+    swift:5.10.1-amazonlinux2 \
+    swift build --product StreetIlluminator -c release -Xswiftc -static-stdlib \
 ```
 then...
 ```
@@ -31,6 +31,6 @@ curl --header "Content-Type: application/json" \
 ```
 curl --header "Content-Type: application/json" \
   --request POST \
-  --data '{"body": "{\"box\": {\"coordinate1\": {\"longitude\": 4.664532, \"latitude\": 52.747660},\"coordinate2\": {\"longitude\": 5.164188, \"latitude\": 51.991564}},\"selfPaginate\": false,\"page\":2,\"limit\":10000000}"}' \
+  --data '{"body": "{\"box\": {\"coordinate1\": {\"longitude\": 4.88, \"latitude\": 52.39},\"coordinate2\": {\"longitude\": 4.89, \"latitude\": 52.40}},\"selfPaginate\": false,\"page\":1,\"limit\":10000000}"}' \
   http://127.0.0.1:7000/invoke
   ```

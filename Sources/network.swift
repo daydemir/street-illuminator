@@ -11,13 +11,16 @@ import NIOFoundationCompat
 import NIOCore
 import AWSDynamoDB
 import SotoDynamoDB
+import SotoS3
+
+fileprivate let tenMB = 1024*1024*10
 
 struct Network {
     
     static func run(request: HTTPClientRequest) async throws -> Data {
         print("request url: \(request.url)")
         let response = try await HTTPClient.shared.execute(request, timeout: .seconds(60))
-        return Data(buffer: try await response.body.collect(upTo: 1024*1024*10)) //10mb
+        return Data(buffer: try await response.body.collect(upTo: tenMB))
     }
 }
 
@@ -37,7 +40,6 @@ struct Database {
             print("output: \(output)")
         } catch {
             if (error as? SotoDynamoDB.DynamoDBErrorType)?.errorCode == "ProvisionedThroughputExceededException" {
-//            if error.localizedDescription.contains("ProvisionedThroughputExceededException") {
                 print("throughput exceeded, waiting 5 seconds...")
                 try await Task.sleep(for: .seconds(5))
                 try await batchWrite(toTable: table, items: items)
@@ -45,5 +47,16 @@ struct Database {
                 throw error
             }
         }
+    }
+}
+
+struct Storage {
+    static let s3 = S3(client: awsClient)
+    
+    static func write(imageURL: String, bucket: String, key: String) async throws {
+        let imageByteBuffer = try await HTTPClient.shared.execute(HTTPClientRequest(url: imageURL), timeout: .seconds(30)).body.collect(upTo: tenMB)
+        let putRequest = S3.PutObjectRequest(body: .byteBuffer(imageByteBuffer), bucket: bucket, key: key)
+        let output = try await s3.putObject(putRequest)
+        print(output)
     }
 }

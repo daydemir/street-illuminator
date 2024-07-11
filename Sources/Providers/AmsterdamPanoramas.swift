@@ -13,6 +13,7 @@ import SotoS3
 
 struct AmsterdamPanoramas {
     private static let base = "https://api.data.amsterdam.nl/panorama/panoramas/"
+    private static let prefix = "https://t1.data.amsterdam.nl/"
     
     struct Link: Codable {
         let href: String?
@@ -193,6 +194,27 @@ struct AmsterdamPanoramas {
         print("next: \(imageGroup._links.next.href ?? "none")")
         
         try await Database.batchWrite(toTable: "amsterdam-panoramas", items: images)
+        
+        let saveImagesTask = Task {
+            try await withThrowingTaskGroup(of: String.self) { group in
+                images.compactMap { $0._links.equirectangular_small.href }
+                    .forEach { url in
+                        group.addTask {
+                            do {
+                                try await Storage.write(imageURL: url, bucket: "amsterdam-api-data", key: url.removePrefix(AmsterdamPanoramas.prefix))
+                                return "image saved!"
+                            } catch {
+                                return "error saving image: \(error)"
+                            }
+                        }
+                    }
+
+                try await group.waitForAll()
+            }
+        }
+
+        let imageSavingResults = await saveImagesTask.result
+        print(imageSavingResults)
         
         print("saved results of url: \(url)")
         print("---------------------")
