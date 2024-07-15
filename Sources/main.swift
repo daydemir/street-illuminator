@@ -2,41 +2,52 @@ import Foundation
 import AWSLambdaRuntime
 import SmithyIdentity
 import AsyncHTTPClient
+import street_core
 
 struct Input: Codable {
     let body: String
 }
 
-struct Output: Codable {
-    let result: String
+struct Output<T: ImageData>: Codable {
+    let result: [T]
 }
 
+
+struct RegionRequest: Codable {
+    
+    enum Provider: String, Codable {
+        case amsterdam_panoramas
+        case google
+        case mapillary
+    }
+    
+    let provider: Provider
+    let box: BoundingBox
+    let limit: Int
+    
+//    let after: Date?
+//    let page: Int?
+}
 
 
 Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Swift.Error>) -> Void) in
     Task {
         
-        
-//        let box = BoundingBox(coordinate1: input.coordinate1, coordinate2: input.coordinate2)
-        
         do {
-            let panoRequest: AmsterdamPanoramas.BoxRequest = try JSONDecoder().decode(AmsterdamPanoramas.BoxRequest.self, from: input.body)
-            try await panoRequest.saveImages()
-            callback(.success(Output(result: "success! saved:\n\(panoRequest.url)")))
+            let regionRequest: RegionRequest = try JSONDecoder().decode(RegionRequest.self, from: input.body)
+            switch regionRequest.provider {
+            case .amsterdam_panoramas:
+                let panoRequest = AmsterdamPanoramas.BoxRequest(regionRequest: regionRequest)
+                let images = try await panoRequest.images()
+                callback(.success(Output<AmsterdamPanoramas.Image>(result: images)))
+            case .google:
+                callback(.failure(Error.unsupportedProvider))
+            case .mapillary:
+                callback(.failure(Error.unsupportedProvider))
+            }
         } catch {
             callback(.failure(error))
         }
-        
-        
-
-//        for page in startPage..<startPage+10 {
-//            do {
-//                try await Provider.amsterdamPanos.loadImages(startPage: page, limit:
-//                callback(.success(Output(result: "success! saved page \(startPage)")))
-//            } catch {
-//                callback(.failure(Error.some(error: error, page: page)))
-//            }
-//        }
         
 //        let date = Date("1/1/2022, 12:00 PM", strategy: .dateTime)
         
@@ -66,6 +77,7 @@ Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Swift.E
 enum Error: Swift.Error {
     case some(error: Swift.Error, page: Int)
     case noStartPage
+    case unsupportedProvider
     
     var localizedDescription: String {
         switch self {
@@ -73,6 +85,8 @@ enum Error: Swift.Error {
             return "Page \(page) failed. \(error.localizedDescription)"
         case .noStartPage:
             return "No start page found in body JSON"
+        case .unsupportedProvider:
+            return "This data provider is currently unsupported"
         }
     }
 }

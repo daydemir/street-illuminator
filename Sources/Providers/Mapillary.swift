@@ -27,7 +27,7 @@ struct Mapillary {
         }
         
         
-        func images() async throws -> [any ImageData] {
+        func images() async throws -> [Mapillary.Image] {
             let request = HTTPClientRequest(url: "https://graph.mapillary.com/images?\(queryParams())")
             return try await JSONDecoder().decode(ImageGroup.self, from: Network.run(request: request)).data
         }

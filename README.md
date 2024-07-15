@@ -24,7 +24,7 @@ scripts/package.sh StreetIlluminator
 ```
 curl --header "Content-Type: application/json" \
   --request POST \
-  --data '{"coordinate1": {"longitude": 4.910801, "latitude": 52.373718331214945}, "coordinate2": {"longitude": 4.917425, "latitude": 52.375034}}' \
+    --data '{"body": "{\"provider\": \"amsterdam_panoramas\", \"box\": {\"coordinate1\": {\"longitude\": 4.913801, \"latitude\": 52.373718331214945},\"coordinate2\": {\"longitude\": 4.917425, \"latitude\": 52.375034}},\"limit\":10000000}"}' \
   http://127.0.0.1:7000/invoke
 ```
 

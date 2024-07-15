@@ -127,11 +127,20 @@ struct AmsterdamPanoramas {
     
     struct BoxRequest: MultiImageRequest, Codable {
         
+        
         let box: BoundingBox
         let after: Date?
         let limit: Int
         let page: Int?
         let selfPaginate: Bool
+        
+        init(regionRequest: RegionRequest) {
+            self.box = regionRequest.box
+            self.after = regionRequest.after
+            self.limit = regionRequest.limit
+            self.page = regionRequest.page
+            self.selfPaginate = true
+        }
         
         
         private func dateQuery() -> String {
@@ -149,7 +158,7 @@ struct AmsterdamPanoramas {
             try await collectImagesAndWriteDB(url: url, selfPaginate: selfPaginate)
         }
         
-        func images() async throws -> [ImageData] {
+        func images() async throws -> [AmsterdamPanoramas.Image] {
             return try await collectImages(url: url, currentImages: [])
         }
         
@@ -167,7 +176,7 @@ struct AmsterdamPanoramas {
     }
     
     
-    private static func collectImages(url: String, currentImages: [ImageData]) async throws -> [ImageData] {
+    private static func collectImages(url: String, currentImages: [AmsterdamPanoramas.Image]) async throws -> [AmsterdamPanoramas.Image] {
         let data = try await Network.run(request: HTTPClientRequest(url: url))
         let imageGroup = try JSONDecoder().decode(MultiImage.self, from: data)
         let updatedImages = currentImages + imageGroup._embedded.panoramas
