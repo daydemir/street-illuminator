@@ -11,6 +11,7 @@ import AsyncHTTPClient
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import street_core
 
 
 enum Model {

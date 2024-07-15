@@ -7,6 +7,7 @@
 
 import Foundation
 import AsyncHTTPClient
+import street_core
 
 struct Mapillary {
     
@@ -38,6 +39,7 @@ struct Mapillary {
     }
 
     struct Image: Codable, ImageData {
+        
         let id: String
         let captured_at: TimeInterval
         let geometry: Geometry
