@@ -7,10 +7,8 @@
 
 import Foundation
 import AsyncHTTPClient
-//import AWSDynamoDB
-import SotoDynamoDB
-import SotoS3
 import street_core
+import SotoDynamoDB
 
 struct AmsterdamPanoramas {
     private static let base = "https://api.data.amsterdam.nl/panorama/panoramas/"
