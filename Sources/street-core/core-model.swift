@@ -17,7 +17,7 @@ public struct StreetImage: Codable {
     
     let id: String
     let location: Coordinates
-    let date: Date
+    let date: Date?
     let url: URL
     let fov: Double
     let heading: Double
@@ -31,11 +31,14 @@ public struct StreetImage: Codable {
         self.url = try pano.imageURL()
     }
     
-//    init(_ image: Mapillary.Image) throws {
-//        self.id = image.id
-//        self.location = image.location()!
-//        self.fov = image.
-//    }
+    init(_ image: GoogleStreetView.Image) throws {
+        self.id = image.pano_id
+        self.url = URL(string: image.url)!
+        self.date = image.date
+        self.fov = image.fieldOfView
+        self.heading = image.heading
+        self.location = image.location
+    }
 }
 
 

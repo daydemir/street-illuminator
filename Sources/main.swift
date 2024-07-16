@@ -8,7 +8,7 @@ struct Input: Codable {
 }
 
 struct Output: Codable {
-    let result: [AmsterdamPanoramas.Image]
+    let result: [StreetImage]
 }
 
 
@@ -37,17 +37,14 @@ Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Swift.E
             switch regionRequest.provider {
             case .amsterdam_panoramas:
                 let panoRequest = AmsterdamPanoramas.BoxRequest(regionRequest: regionRequest)
-                let images = try await panoRequest.images()
+                let images = try await panoRequest.images().map { try StreetImage($0) }
                 callback(.success(Output(result: images)))
-//                callback(.failure(Error.unsupportedProvider))
             case .google:
-                callback(.failure(Error.unsupportedProvider))
-
-//                let request = GoogleStreetView.Request(box: regionRequest.box, limit: regionRequest.limit)
-//                let images = try await request.images()
-//                print(images.count)
-//                callback(.success(Output(result: images)))
-                callback(.failure(Error.unsupportedProvider))
+                let request = GoogleStreetView.Request(box: regionRequest.box, limit: regionRequest.limit)
+                let images = try await request.images().map { try StreetImage($0) }
+                print(images.count)
+                print(images.map { $0.url })
+                callback(.success(Output(result: images)))
             case .mapillary:
                 callback(.failure(Error.unsupportedProvider))
 
