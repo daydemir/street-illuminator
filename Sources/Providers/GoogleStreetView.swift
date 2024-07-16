@@ -55,7 +55,7 @@ struct GoogleStreetView {
             let requests = SingleRequest.fill(fromBox: box)[0..<limit]
             print("Locations: \(requests.count)")
             
-            return try await requests.asyncMap { request in
+            let images = try await requests.asyncMap { request in
                 let data = try await Network.run(request: HTTPClientRequest(url: request.metadataURL().absoluteString))
                 if let metadata = try? JSONDecoder().decode(ImageMetadata.self, from: data) {
                     return try await metadata.image(request: request)
@@ -63,6 +63,7 @@ struct GoogleStreetView {
                     return nil
                 }
             }.compactMap { $0 }
+            return Set(images).map { $0 }
         }
         
         

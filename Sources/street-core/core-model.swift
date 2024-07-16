@@ -7,13 +7,16 @@
 
 import Foundation
 
-public struct Coordinates: Codable {
+public struct Coordinates: Codable, Hashable {
     let latitude: Double
     let longitude: Double
     let altitude: Double?
 }
 
-public struct StreetImage: Codable {
+public struct StreetImage: Codable, Hashable {
+    public static func == (lhs: StreetImage, rhs: StreetImage) -> Bool {
+        return lhs.id == rhs.id
+    }
     
     let id: String
     let location: Coordinates
