@@ -7,7 +7,6 @@
 
 import Foundation
 import AsyncHTTPClient
-import street_core
 
 struct Mapillary {
     
@@ -22,8 +21,14 @@ struct Mapillary {
     //    let startDate: Date
     //    let endDate: Date
         
+        
+        init(regionRequest: RegionRequest) {
+            self.box = regionRequest.box
+            self.limit = regionRequest.limit
+        }
+        
         func queryParams() -> String {
-            return "access_token=\(Keys().mapillaryAPIKey)&bbox=\(box.cornersQuery())&limit=\(limit)&fields=id,thumb_2048_url,geometry,captured_at,detections"
+            return "access_token=\(Keys().mapillaryAPIKey)&bbox=\(box.cornersQuery())&limit=\(limit)&fields=id,thumb_2048_url,geometry,captured_at,detections,is_pano,compass_angle,computed_altitude,computed_compass_angle,camera_parameters,altitude,thumb_original_url,mesh"
         }
         
         

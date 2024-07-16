@@ -7,7 +7,6 @@
 
 import Foundation
 import AsyncHTTPClient
-import street_core
 import SotoDynamoDB
 
 struct AmsterdamPanoramas {
@@ -136,9 +135,11 @@ struct AmsterdamPanoramas {
         
         init(regionRequest: RegionRequest) {
             self.box = regionRequest.box
-            self.after = regionRequest.after
+//            self.after = regionRequest.after
+            self.after = nil
             self.limit = regionRequest.limit
-            self.page = regionRequest.page
+//            self.page = regionRequest.page
+            self.page = nil
             self.selfPaginate = true
         }
         

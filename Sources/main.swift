@@ -2,14 +2,13 @@ import Foundation
 import AWSLambdaRuntime
 import SmithyIdentity
 import AsyncHTTPClient
-import street_core
 
 struct Input: Codable {
     let body: String
 }
 
-struct Output<T: ImageData>: Codable {
-    let result: [T]
+struct Output: Codable {
+    let result: [AmsterdamPanoramas.Image]
 }
 
 
@@ -39,11 +38,23 @@ Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Swift.E
             case .amsterdam_panoramas:
                 let panoRequest = AmsterdamPanoramas.BoxRequest(regionRequest: regionRequest)
                 let images = try await panoRequest.images()
-                callback(.success(Output<AmsterdamPanoramas.Image>(result: images)))
+                callback(.success(Output(result: images)))
+//                callback(.failure(Error.unsupportedProvider))
             case .google:
+                callback(.failure(Error.unsupportedProvider))
+
+//                let request = GoogleStreetView.Request(box: regionRequest.box, limit: regionRequest.limit)
+//                let images = try await request.images()
+//                print(images.count)
+//                callback(.success(Output(result: images)))
                 callback(.failure(Error.unsupportedProvider))
             case .mapillary:
                 callback(.failure(Error.unsupportedProvider))
+
+//                let mapillaryRequest = Mapillary.Request(regionRequest: regionRequest)
+//                let images = try await mapillaryRequest.images()
+//                callback(.success(Output<Mapillary.Image>(result: images)))
+                
             }
         } catch {
             callback(.failure(error))
@@ -73,6 +84,9 @@ Lambda.run { (context, input: Input, callback: @escaping (Result<Output, Swift.E
 //            callback(.success(Output(result: data.description)))
     }
 }
+
+
+
 
 enum Error: Swift.Error {
     case some(error: Swift.Error, page: Int)
