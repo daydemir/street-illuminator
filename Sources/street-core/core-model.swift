@@ -115,7 +115,7 @@ public struct BoundingBox: Codable {
     }
 }
 
-public struct Size: Codable {
+public struct Size: Codable, Hashable {
     public let width: Int
     public let height: Int
 }

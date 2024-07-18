@@ -31,7 +31,11 @@ struct GoogleStreetView {
         }
     }
     
-    struct Image: Codable {
+    struct Image: Codable, Hashable {
+        static func == (lhs: GoogleStreetView.Image, rhs: GoogleStreetView.Image) -> Bool {
+            lhs.pano_id == rhs.pano_id
+        }
+        
         let pano_id: String
         let location: Coordinates
         let status: String
